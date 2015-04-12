@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <title>
+    {%- if block('title') -%}
+      {{ block('title') }} | Taxes
+    {% else %}
+      Taxes
+    {% endif %}
+  </title>
+  {% block stylesheets %}
+    <link rel="stylesheet" href="/../public/css/bootstrap.css">
+  {% endblock %}
+</head>
+<body>
+<div id="main" class="container">
+  {% block body %}{% endblock %}
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="text-muted">Created by Maksym Khrystunov</p>
+  </div>
+</footer>
+
+{% block javascripts %}
+  <script src="/../public/js/jquery.js"></script>
+  <script src="/../public/js/bootstrap.js"></script>
+{% endblock %}
+</body>
+</html>

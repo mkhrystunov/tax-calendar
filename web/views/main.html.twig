@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+  <h1>Tax Calendar</h1>
+
+  <form>
+    <div class="input-group">
+      <label for="group">{% trans %}group-label{% endtrans %}</label>
+      <select class="form-control" id="group" name="group-id">
+        {% for group in groups %}
+          <option value="{{ group.id }}">{% trans %}group.name{% endtrans %}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {#{% if group.hasTax(tax.id) %}#}
+    {% if true %}
+      <div class="input-group">
+        <label for="{{ tax.id }}">{% trans %}tax.name{% endtrans %}</label>
+        <select class="form-control" id="{{ tax.id }}" name="{{ tax.id }}">
+          {% for  %}
+        </select>
+      </div>
+    {% endif %}
+  </form>
+{% endblock %}
