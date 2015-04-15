@@ -3,23 +3,105 @@
 {% block body %}
   <h1>Tax Calendar</h1>
 
-  <form>
+  <form id="form" action="/calendar">
     <div class="input-group">
       <label for="group">{% trans %}group-label{% endtrans %}</label>
       <select class="form-control" id="group" name="group-id">
         {% for group in groups %}
-          <option value="{{ group.id }}">{% trans %}group.name{% endtrans %}</option>
+          <option value="{{ group.id }}" {{ group.id == selected_group.id ? 'selected' }}>{{ group.name|trans }}</option>
         {% endfor %}
       </select>
     </div>
-    {#{% if group.hasTax(tax.id) %}#}
-    {% if true %}
+
+    {% for tax in taxes %}
+      {% if selected_group.hasTaxId(tax.id) and tax.rangesForGroup(selected_group.id)|length > 1 %}
+        <div class="input-group">
+          <label for="tax-{{ tax.id }}">{{ tax.name|trans }}</label>
+          <select id="tax-{{ tax.id }}" name="tax-range-{{ tax.id }}" class="form-control">
+            {% for range in tax.rangesForGroup(selected_group.id) %}
+              <option>{{ range.range }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    {% if languages|length > 1 %}
       <div class="input-group">
-        <label for="{{ tax.id }}">{% trans %}tax.name{% endtrans %}</label>
-        <select class="form-control" id="{{ tax.id }}" name="{{ tax.id }}">
-          {% for  %}
+        <label for="language">{% trans %}language-label{% endtrans %}</label>
+        <select id="language" name="_locale" class="form-control">
+          {% for language in languages %}
+            <option>{{ language|trans }}</option>
+          {% endfor %}
         </select>
       </div>
     {% endif %}
+
+    <div class="input-group">
+      <label for="date-start">{% trans %}date-start-label{% endtrans %}</label>
+      <input type="date" id="date-start" name="date-start" class="form-control date-input"
+             required min="{{ cur_year }}-01-01" max="{{ cur_year }}-12-31">
+    </div>
+    <div class="input-group">
+      <label for="date-end">{% trans %}date-end-label{% endtrans %}</label>
+      <input type="date" id="date-end" name="date-end" class="form-control date-input"
+             required min="{{ cur_year }}-01-01" max="{{ cur_year }}-12-31">
+    </div>
+
+    <a class="btn btn-success btn-lg" id="submit">Send</a>
   </form>
+
+  <div class="modal fade" id="modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h4 class="modal-title">{% trans %}Actions{% endtrans %}</h4>
+        </div>
+        <div class="modal-body" id="modal-body">
+          <p>One fine body…</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}close{% endtrans %}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script>
+    Date.prototype.toDateInputValue = (function () {
+      var local = new Date(this);
+      local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+      return local.toJSON().slice(0, 10);
+    });
+
+    $(document).ready(function () {
+      $('.date-input').val(new Date().toDateInputValue());
+    });
+
+    $('#group').on('change', function (e) {
+      e.preventDefault();
+      window.location = '?group=' + this.value;
+    });
+
+    $('#submit').on('click', function (e) {
+      e.preventDefault();
+      var $form = $('#form');
+      $.ajax({
+        url: $form.attr('action'),
+        method: 'post',
+        data: $form.serialize()
+      }).done(function (data) {
+        var $modalBody = $('#modal-body');
+        $modalBody.text('');
+        data.actions.forEach(function (el) {
+          $modalBody.append('<p>' + el + '</p>');
+        });
+        $('#modal').modal('show');
+      });
+    });
+  </script>
 {% endblock %}

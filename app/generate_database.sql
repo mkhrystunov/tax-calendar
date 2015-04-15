@@ -37,12 +37,12 @@ CREATE TABLE taxes_for_groups (
   group_id INT REFERENCES groups,
   tax_id INT REFERENCES taxes,
   range_id INT REFERENCES ranges,
-  days_to_pay INT NOT NULL,
+  days INT NOT NULL,
   pre_paid BOOLEAN DEFAULT FALSE
 );
 
 INSERT INTO taxes_for_groups
-(group_id, tax_id, range_id, days_to_pay, pre_paid)
+(group_id, tax_id, range_id, days, pre_paid)
 VALUES
   (1, 1, 1, 20, false), -- first group social tax per month after pay
   (1, 1, 2, 20, false), -- first group social tax per quarter after pay
@@ -67,12 +67,12 @@ CREATE TABLE reports (
   report_id SERIAL PRIMARY KEY NOT NULL,
   group_id INT REFERENCES groups,
   range_id INT REFERENCES ranges,
-  days_to_pay INT NOT NULL,
+  days INT NOT NULL,
   continuing BOOLEAN DEFAULT false
 );
 
 INSERT INTO reports
-(group_id, range_id, days_to_pay, continuing)
+(group_id, range_id, days, continuing)
 VALUES
   (1, 3, 40, false), -- first group per year not continuing
   (2, 3, 40, false), -- second group per year not continuing

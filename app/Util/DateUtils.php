@@ -1,5 +1,10 @@
 <?php
 
+namespace Util;
+
+use DateTime;
+use InvalidArgumentException;
+
 class DateUtils
 {
     const PERIOD_YEAR = 'year';
@@ -91,13 +96,37 @@ class DateUtils
                 break;
         }
 
-        return$newDate;
+        return $newDate;
+    }
+
+    /**
+     * @param $period
+     * @param DateTime $start
+     * @param DateTime $end
+     * @return DateTime[]
+     */
+    public static function getPeriodsWithinRange($period, DateTime $start, DateTime $end)
+    {
+        self::checkPeriod($period);
+        $step = $period === DateUtils::PERIOD_QUARTER ? '3 month' : '1 ' . $period;
+        $cur = $start;
+        $periods = [];
+        while($cur < $end)
+        {
+            $firstDate = self::firstDateOf($period, $cur);
+            if ($firstDate <= self::lastDayOf($period, $cur)) {
+                $periods[] = $firstDate;
+            }
+            $cur = new DateTime($cur->format('d-m-Y') . '+' . $step);
+        }
+        return $periods;
     }
 
     /**
      * @param string $period
+     * @throws InvalidArgumentException
      */
-    private static function checkPeriod($period)
+    public static function checkPeriod($period)
     {
         $period = strtolower($period);
         if (!in_array($period, self::$validPeriods)) {
